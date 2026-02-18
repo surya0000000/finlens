@@ -17,7 +17,12 @@ const severityLabelMap: Record<Insight["severity"], string> = {
   warning: "Attention",
 };
 
-export const DashboardPage = (): JSX.Element => {
+const tooltipFormatter = (value: unknown): string => {
+  const numericValue = typeof value === "number" ? value : Number(value);
+  return formatCurrency(Number.isFinite(numericValue) ? numericValue : 0);
+};
+
+export const DashboardPage = () => {
   const queryClient = useQueryClient();
   const dashboardQuery = useQuery({
     queryKey: ["dashboard"],
@@ -113,7 +118,7 @@ export const DashboardPage = (): JSX.Element => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="category" tick={{ fontSize: 12 }} />
                 <YAxis tickFormatter={(value) => `$${value}`} />
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                <Tooltip formatter={tooltipFormatter} />
                 <Bar dataKey="amount" fill="#2f6fed" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>

@@ -18,7 +18,7 @@ type ExchangeResponse = {
   plaidItemId: string;
 };
 
-export const PlaidConnectCard = ({ onLinked }: PlaidConnectCardProps): JSX.Element => {
+export const PlaidConnectCard = ({ onLinked }: PlaidConnectCardProps) => {
   const [linkToken, setLinkToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 

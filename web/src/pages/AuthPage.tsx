@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { FormEvent } from "react";
 import { Navigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
@@ -6,7 +7,7 @@ import { extractApiError } from "../lib/api";
 
 type AuthMode = "login" | "register";
 
-export const AuthPage = (): JSX.Element => {
+export const AuthPage = () => {
   const { token, login, register } = useAuth();
   const [mode, setMode] = useState<AuthMode>("login");
   const [formState, setFormState] = useState({
@@ -22,7 +23,7 @@ export const AuthPage = (): JSX.Element => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const onSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const onSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     setError(null);
     setIsSubmitting(true);

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import type { PropsWithChildren } from "react";
@@ -27,7 +28,7 @@ const persistAuth = (token: string): void => {
   authStorage.setToken(token);
 };
 
-export const AuthProvider = ({ children }: PropsWithChildren): JSX.Element => {
+export const AuthProvider = ({ children }: PropsWithChildren) => {
   const [token, setToken] = useState<string | null>(() => authStorage.getToken());
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);

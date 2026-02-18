@@ -9,7 +9,7 @@ import type { Account, TransactionsResponse } from "../types/api";
 
 const pageSize = 25;
 
-export const AccountsPage = (): JSX.Element => {
+export const AccountsPage = () => {
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
   const [page, setPage] = useState<number>(1);
 

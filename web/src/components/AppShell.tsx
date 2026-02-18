@@ -13,7 +13,7 @@ const navItems = [
   { to: "/advisor", label: "Advisor", icon: MessageCircle },
 ];
 
-export const AppShell = ({ children }: PropsWithChildren): JSX.Element => {
+export const AppShell = ({ children }: PropsWithChildren) => {
   const { user, logout } = useAuth();
   const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(" ");
 

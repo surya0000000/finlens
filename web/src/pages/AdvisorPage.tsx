@@ -16,7 +16,7 @@ type ChatMessage = {
   };
 };
 
-export const AdvisorPage = (): JSX.Element => {
+export const AdvisorPage = () => {
   const [question, setQuestion] = useState("");
   const [chat, setChat] = useState<ChatMessage[]>([
     {

@@ -9,7 +9,12 @@ import type { DashboardResponse, Insight } from "../types/api";
 
 const palette = ["#2f6fed", "#0ea5e9", "#22c55e", "#f59e0b", "#ef4444", "#a855f7"];
 
-export const InsightsPage = (): JSX.Element => {
+const tooltipFormatter = (value: unknown): string => {
+  const numericValue = typeof value === "number" ? value : Number(value);
+  return formatCurrency(Number.isFinite(numericValue) ? numericValue : 0);
+};
+
+export const InsightsPage = () => {
   const dashboardQuery = useQuery({
     queryKey: ["dashboard"],
     queryFn: async () => {
@@ -44,13 +49,15 @@ export const InsightsPage = (): JSX.Element => {
                   cx="50%"
                   cy="50%"
                   outerRadius={110}
-                  label={({ category, percent }) => `${category}: ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) =>
+                    `${String(name ?? "Category")}: ${((percent ?? 0) * 100).toFixed(0)}%`
+                  }
                 >
                   {dashboardQuery.data.topSpendingCategories.map((entry, index) => (
                     <Cell key={entry.category} fill={palette[index % palette.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                <Tooltip formatter={tooltipFormatter} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>

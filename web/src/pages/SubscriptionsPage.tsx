@@ -7,7 +7,7 @@ import { api } from "../lib/api";
 import { formatCurrency, formatDate } from "../lib/format";
 import type { Subscription, SubscriptionsResponse } from "../types/api";
 
-export const SubscriptionsPage = (): JSX.Element => {
+export const SubscriptionsPage = () => {
   const [selectedMerchants, setSelectedMerchants] = useState<string[]>([]);
 
   const subscriptionsQuery = useQuery({

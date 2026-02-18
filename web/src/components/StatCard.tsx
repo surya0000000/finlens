@@ -8,7 +8,7 @@ type StatCardProps = {
   icon?: ReactNode;
 };
 
-export const StatCard = ({ label, value, tone = "neutral", hint, icon }: StatCardProps): JSX.Element => (
+export const StatCard = ({ label, value, tone = "neutral", hint, icon }: StatCardProps) => (
   <article className={`card stat-card tone-${tone}`}>
     <div className="stat-card-row">
       <span className="stat-label">{label}</span>

@@ -1,12 +1,12 @@
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 
 type SectionCardProps = PropsWithChildren<{
   title: string;
   subtitle?: string;
-  action?: JSX.Element;
+  action?: ReactNode;
 }>;
 
-export const SectionCard = ({ title, subtitle, action, children }: SectionCardProps): JSX.Element => (
+export const SectionCard = ({ title, subtitle, action, children }: SectionCardProps) => (
   <section className="card section-card">
     <header className="section-header">
       <div>

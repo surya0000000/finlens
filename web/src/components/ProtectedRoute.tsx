@@ -5,7 +5,7 @@ import type { PropsWithChildren } from "react";
 import { useAuth } from "../context/AuthContext";
 import { LoadingState } from "./LoadingState";
 
-export const ProtectedRoute = ({ children }: PropsWithChildren): JSX.Element => {
+export const ProtectedRoute = ({ children }: PropsWithChildren) => {
   const { token, isLoading } = useAuth();
 
   if (isLoading) {
