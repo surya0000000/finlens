@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - cursor/**
+  pull_request:
+
+jobs:
+  backend-build:
+    name: Backend build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prisma generate
+        run: npm run prisma:generate
+        env:
+          DATABASE_URL: file:./prisma/dev.db
+
+      - name: Build backend
+        run: npm run build
+        env:
+          DATABASE_URL: file:./prisma/dev.db
+          JWT_SECRET: 12345678901234567890123456789012
+          TOKEN_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+          PLAID_CLIENT_ID: ci_plaid_id
+          PLAID_SECRET: ci_plaid_secret
+
+  web-build:
+    name: Frontend build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+        env:
+          VITE_API_BASE_URL: http://localhost:4000/api/v1
+

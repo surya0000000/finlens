@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log
+dist
+.env
+.git
+.github
+web/node_modules
+web/dist
+prisma/dev.db
+prisma/dev.db-journal
+
