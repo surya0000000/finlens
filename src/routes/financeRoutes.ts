@@ -1,7 +1,8 @@
-import { prisma } from "../lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { Router } from "express";
 import { z } from "zod";
 
+import { prisma } from "../lib/prisma";
 import { getDashboardSummary } from "../services/dashboardService";
 import { generateInsightsForUser } from "../services/insightService";
 import {
@@ -18,14 +19,8 @@ const transactionsQuerySchema = z.object({
   pageSize: z.coerce.number().int().positive().max(200).default(50),
   accountId: z.string().min(1).optional(),
   category: z.string().min(1).optional(),
-  from: z
-    .string()
-    .optional()
-    .transform((value) => (value ? new Date(value) : undefined)),
-  to: z
-    .string()
-    .optional()
-    .transform((value) => (value ? new Date(value) : undefined)),
+  from: z.coerce.date().optional(),
+  to: z.coerce.date().optional(),
 });
 
 const simulationSchema = z.object({
@@ -69,15 +64,27 @@ financeRoutes.get("/transactions", async (request, response) => {
 
   const query = transactionsQuerySchema.parse(request.query);
 
-  const where = {
-    userId,
-    accountId: query.accountId,
-    primaryCategory: query.category,
-    date: {
-      gte: query.from,
-      lte: query.to,
-    },
-  };
+  const where: Prisma.TransactionWhereInput = { userId };
+
+  if (query.accountId) {
+    where.accountId = query.accountId;
+  }
+
+  if (query.category) {
+    where.primaryCategory = query.category;
+  }
+
+  if (query.from || query.to) {
+    where.date = {};
+
+    if (query.from) {
+      where.date.gte = query.from;
+    }
+
+    if (query.to) {
+      where.date.lte = query.to;
+    }
+  }
 
   const [totalCount, transactions] = await Promise.all([
     prisma.transaction.count({ where }),

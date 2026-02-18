@@ -1,5 +1,6 @@
 import { CountryCode } from "plaid";
 
+import { env } from "../config/env";
 import { prisma } from "../lib/prisma";
 import { encryptString } from "../utils/crypto";
 import { HttpError } from "../utils/httpError";
@@ -16,7 +17,7 @@ export const createPlaidLinkToken = async (userId: string): Promise<{
   linkToken: string;
   expiration: string;
 }> => {
-  const linkTokenResponse = await plaidClient.linkTokenCreate({
+  const linkTokenPayload = {
     client_name: "FinLens X",
     language: "en",
     country_codes: plaidDefaults.countryCodes as CountryCode[],
@@ -24,15 +25,10 @@ export const createPlaidLinkToken = async (userId: string): Promise<{
       client_user_id: userId,
     },
     products: plaidDefaults.products,
-    account_filters: {
-      depository: {
-        account_subtypes: ["checking", "savings", "money market", "paypal", "prepaid"],
-      },
-      credit: {
-        account_subtypes: ["credit card", "paypal"],
-      },
-    },
-  });
+    redirect_uri: env.plaidRedirectUri,
+  };
+
+  const linkTokenResponse = await plaidClient.linkTokenCreate(linkTokenPayload);
 
   return {
     linkToken: linkTokenResponse.data.link_token,
@@ -138,7 +134,7 @@ export const listPlaidItemsForUser = async (userId: string): Promise<
   });
 
 export const createSandboxPublicToken = async (institutionId?: string): Promise<string> => {
-  if (process.env.PLAID_ENV !== "sandbox") {
+  if (env.PLAID_ENV !== "sandbox") {
     throw new HttpError(400, "Sandbox public token helper is only available in PLAID_ENV=sandbox.");
   }
 

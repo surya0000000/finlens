@@ -1,7 +1,8 @@
 import { Prisma } from "@prisma/client";
+import { Transaction as PlaidTransaction } from "plaid";
 
 import { prisma } from "../lib/prisma";
-import { addDays, parsePlaidDate } from "../utils/date";
+import { parsePlaidDate } from "../utils/date";
 import { HttpError } from "../utils/httpError";
 import { decryptString } from "../utils/crypto";
 import { plaidClient } from "./plaidClient";
@@ -106,34 +107,7 @@ const upsertTransactions = async (params: {
   userId: string;
   plaidItemId: string;
   accountMap: Map<string, string>;
-  transactions: Array<{
-    transaction_id: string;
-    pending_transaction_id: string | null;
-    account_id: string;
-    amount: number;
-    iso_currency_code: string | null;
-    unofficial_currency_code: string | null;
-    date: string;
-    authorized_date?: string | null;
-    pending: boolean;
-    payment_channel:
-      | "online"
-      | "in store"
-      | "other"
-      | "unknown"
-      | "recurring"
-      | null
-      | undefined;
-    name: string;
-    merchant_name?: string | null;
-    personal_finance_category?: {
-      primary?: string | null;
-      detailed?: string | null;
-    } | null;
-    location?: unknown;
-    counterparties?: unknown;
-    [key: string]: unknown;
-  }>;
+  transactions: PlaidTransaction[];
 }): Promise<void> => {
   const { userId, plaidItemId, accountMap, transactions } = params;
 
@@ -229,9 +203,6 @@ export const syncSinglePlaidItem = async (
       access_token: accessToken,
       cursor,
       count: 100,
-      options: {
-        days_requested: 730,
-      },
     });
 
     const { added, modified, removed, next_cursor: nextCursor, has_more: morePages } =
@@ -346,7 +317,7 @@ export const calculateForecastBurnRate = (transactions: Array<{ amount: number; 
   const avgDailyOutflow = totalOutflow / observedDays;
   return {
     avgDailyOutflow,
-    projected30dOutflow: addDays(new Date(), 30) ? avgDailyOutflow * 30 : avgDailyOutflow * 30,
+    projected30dOutflow: avgDailyOutflow * 30,
   };
 };
 
