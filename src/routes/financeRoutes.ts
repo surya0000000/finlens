@@ -3,6 +3,7 @@ import { Router } from "express";
 import { z } from "zod";
 
 import { prisma } from "../lib/prisma";
+import { seedDemoDataForUser } from "../services/demoDataService";
 import { getDashboardSummary } from "../services/dashboardService";
 import { generateInsightsForUser } from "../services/insightService";
 import {
@@ -25,6 +26,10 @@ const transactionsQuerySchema = z.object({
 
 const simulationSchema = z.object({
   merchantNames: z.array(z.string().min(1)).min(1),
+});
+
+const demoSeedSchema = z.object({
+  resetExisting: z.boolean().optional().default(false),
 });
 
 financeRoutes.get("/accounts", async (request, response) => {
@@ -180,6 +185,21 @@ financeRoutes.get("/insights", async (request, response) => {
 
   const insights = await generateInsightsForUser(userId);
   response.status(200).json({ insights });
+});
+
+financeRoutes.post("/demo-seed", async (request, response) => {
+  const userId = request.user?.id;
+  if (!userId) {
+    throw new HttpError(401, "Unauthorized.");
+  }
+
+  const payload = demoSeedSchema.parse(request.body ?? {});
+  const result = await seedDemoDataForUser({
+    userId,
+    resetExisting: payload.resetExisting,
+  });
+
+  response.status(200).json(result);
 });
 
 export { financeRoutes };

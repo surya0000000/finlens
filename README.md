@@ -1,150 +1,150 @@
-# FinLens X Backend
+# FinLens X (Full Stack)
 
-Production-style backend for **FinLens X**, a read-only personal finance intelligence platform with:
+FinLens X is now a deployable full-stack MVP:
 
-- Secure account linking via **Plaid** (Sandbox/Dev/Prod environments)
-- Transaction ingestion and sync via `transactions/sync` cursors
-- Unified account + dashboard APIs
-- Subscription detection and cancellation simulation
-- AI advisor endpoint (OpenAI optional, deterministic fallback built in)
-- Privacy-first token handling (AES-256-GCM encrypted Plaid access tokens)
+- **Backend API** (Express + TypeScript + Prisma + Plaid)
+- **Web app** (React + Vite + React Query + Recharts + Plaid Link)
+- **Dockerized deployment** (backend + frontend)
+- **CI workflow** (backend build + frontend build)
 
----
-
-## Tech Stack
-
-- **Runtime:** Node.js + TypeScript
-- **API:** Express 5
-- **DB/ORM:** Prisma + SQLite (easy local dev)
-- **Auth:** JWT (email/password)
-- **Integrations:** Plaid, OpenAI (optional)
+This is a privacy-first, read-only financial intelligence platform with actionable insights.
 
 ---
 
-## Implemented Product Capabilities
+## What is included
 
-### 1) Authentication & User Identity
-- Register/login with hashed passwords
-- JWT-protected API routes
-- `/auth/me` profile endpoint
+### Backend
+- JWT auth (`register`, `login`, `me`)
+- Plaid integration (`link-token`, token exchange, sync, list items)
+- Transaction ingestion and normalization
+- Dashboard metrics (net worth, cash flow, utilization, categories)
+- Subscription detection + cancellation simulation
+- Insight engine (explainable cards)
+- Advisor endpoint (OpenAI when configured, deterministic fallback otherwise)
+- Demo data endpoint to make the product usable before live linking
+- Health and readiness endpoints
 
-### 2) Plaid Integration (Read-Only)
-- Create Link token for frontend Plaid Link flow
-- Exchange public token for access token
-- Encrypt access token before storage
-- List linked Plaid items
-- On-demand sync (single item or all)
-- Sandbox helper endpoint to generate a sandbox public token quickly
+### Frontend
+- Authentication flow (register/login)
+- Dashboard with KPI cards + charts
+- Plaid connect (live link flow + sandbox quick connect)
+- Accounts and transaction explorer
+- Subscription analysis and savings simulation
+- Insights page
+- Advisor chat page
+- Responsive layout and polished UI
 
-### 3) Financial Data Layer
-- Upsert Plaid accounts and balances
-- Persist normalized transactions with categories and merchant metadata
-- Handle incremental sync adds/modifies/removals
-
-### 4) FinLens Intelligence APIs
-- Unified dashboard (net worth, cash flow, utilization, categories)
-- Subscription detection (recurrence + confidence score)
-- Subscription cancellation simulation
-- Insight generation
-- Conversational advisor API (AI + fallback rules)
+### Deployment assets
+- Backend `Dockerfile`
+- Frontend `web/Dockerfile` + Nginx config
+- `docker-compose.yml` for one-command deployment
+- GitHub Actions CI (`.github/workflows/ci.yml`)
 
 ---
 
-## Project Structure
+## Repository structure
 
 ```text
-src/
-  app.ts
-  index.ts
-  config/
-    env.ts
-  lib/
-    prisma.ts
-  middleware/
-    auth.ts
-    error.ts
-  routes/
-    authRoutes.ts
-    plaidRoutes.ts
-    financeRoutes.ts
-    advisorRoutes.ts
-    healthRoutes.ts
-    index.ts
-  services/
-    authService.ts
-    plaidClient.ts
-    plaidService.ts
-    transactionSyncService.ts
-    dashboardService.ts
-    subscriptionService.ts
-    insightService.ts
-    advisorService.ts
-  utils/
-    crypto.ts
-    date.ts
-    math.ts
-    httpError.ts
-prisma/
-  schema.prisma
+.
+├─ src/                   # Backend source
+├─ prisma/                # Prisma schema + migrations
+├─ web/                   # Frontend React app
+├─ Dockerfile             # Backend container
+├─ docker-compose.yml     # Full-stack compose deployment
+└─ .github/workflows/ci.yml
 ```
 
 ---
 
-## Environment Configuration
+## Prerequisites
 
-Copy `.env.example` to `.env` and fill values:
+- Node.js 22+
+- npm 10+
+- Plaid credentials (Sandbox recommended for development)
+- Optional: OpenAI API key
+
+---
+
+## Environment setup
+
+### Backend
 
 ```bash
 cp .env.example .env
 ```
 
-Required fields:
+Required backend variables:
 
 - `DATABASE_URL`
 - `JWT_SECRET` (>= 32 chars)
 - `TOKEN_ENCRYPTION_KEY` (64 hex chars / 32 bytes)
 - `PLAID_CLIENT_ID`
 - `PLAID_SECRET`
-- `PLAID_ENV` (`sandbox`, `development`, `production`)
+- `PLAID_ENV`
 
-Optional:
+### Frontend
 
-- `OPENAI_API_KEY` (enables LLM-backed advisor responses)
+```bash
+cp web/.env.example web/.env
+```
+
+Default:
+- `VITE_API_BASE_URL=http://localhost:4000/api/v1`
 
 ---
 
-## Local Setup
+## Run locally (full stack)
+
+Install dependencies:
 
 ```bash
 npm install
-npm run prisma:generate
-npm run prisma:migrate -- --name init
-npm run dev
+npm --prefix web install
 ```
 
-Health check:
+Prepare Prisma:
 
 ```bash
-curl http://localhost:4000/api/v1/health
+npm run prisma:generate
+npm run prisma:migrate -- --name init
 ```
 
+Run backend + web together:
+
+```bash
+npm run dev:full
+```
+
+Apps:
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:4000/api/v1`
+
 ---
 
-## API Base URL
+## Run with Docker (deployment mode)
 
-`/api/v1`
+```bash
+docker compose up --build
+```
+
+Services:
+- Web app: `http://localhost:8080`
+- Backend API: `http://localhost:4000/api/v1`
 
 ---
 
-## API Endpoints
+## Key API endpoints
+
+Base: `/api/v1`
 
 ### Health
 - `GET /health`
+- `GET /health/ready`
 
 ### Auth
 - `POST /auth/register`
 - `POST /auth/login`
-- `GET /auth/me` (Bearer token required)
+- `GET /auth/me`
 
 ### Plaid
 - `POST /plaid/link-token`
@@ -160,76 +160,51 @@ curl http://localhost:4000/api/v1/health
 - `GET /finance/subscriptions`
 - `POST /finance/subscriptions/simulate-cancel`
 - `GET /finance/insights`
+- `POST /finance/demo-seed`
 
 ### Advisor
 - `POST /advisor/query`
 
 ---
 
-## End-to-End Sandbox Flow (No Frontend Required)
+## Demo-first workflow
 
-### 1) Register
-```bash
-curl -X POST http://localhost:4000/api/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email":"demo@finlens.ai",
-    "password":"SuperStrongPassword123!",
-    "firstName":"Demo",
-    "lastName":"User"
-  }'
-```
+If you want immediate UI data without linking real institutions:
 
-Save the returned JWT as `TOKEN`.
+1. Register/login in the web app
+2. Open **Dashboard**
+3. Click **Load demo financial dataset**
 
-### 2) Create Plaid sandbox public token
-```bash
-curl -X POST http://localhost:4000/api/v1/plaid/sandbox/public-token \
-  -H "Authorization: Bearer TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"institutionId":"ins_109508"}'
-```
-
-Save `publicToken`.
-
-### 3) Exchange and auto-sync
-```bash
-curl -X POST http://localhost:4000/api/v1/plaid/exchange-public-token \
-  -H "Authorization: Bearer TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"publicToken":"PUBLIC_TOKEN_HERE"}'
-```
-
-### 4) Pull dashboard + insights
-```bash
-curl http://localhost:4000/api/v1/finance/dashboard \
-  -H "Authorization: Bearer TOKEN"
-
-curl http://localhost:4000/api/v1/finance/insights \
-  -H "Authorization: Bearer TOKEN"
-```
-
-### 5) Ask advisor
-```bash
-curl -X POST http://localhost:4000/api/v1/advisor/query \
-  -H "Authorization: Bearer TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"question":"Can I reduce monthly spend by 10%?"}'
-```
+This seeds realistic accounts + transactions for testing charts, subscriptions, and advisor flows.
 
 ---
 
-## Security & Privacy Notes
+## Security and privacy
 
-- Read-only design: no money movement, no payment execution.
-- Plaid access tokens are encrypted at rest using AES-256-GCM.
-- JWT authentication protects user-scoped data.
-- Rate limiting and secure headers are enabled by default.
+- Read-only data model (no transfers/payments)
+- Plaid access tokens encrypted at rest (AES-256-GCM)
+- JWT-protected APIs
+- CORS allow-list support
+- Rate limiting + security headers
+- Explainable advisor responses with citations
 
 ---
 
-## Important Product Assumptions
+## CI
 
-- This backend currently uses SQLite for local simplicity.
-- For production use, migrate to Postgres and introduce managed secrets, centralized logging, and observability.
-- AI advisor is intentionally non-custodial and non-executional.
+CI runs on push/PR:
+
+- Backend install + Prisma generate + TypeScript build
+- Frontend install + Vite build
+
+---
+
+## Production hardening checklist (recommended next)
+
+- Move from SQLite to managed PostgreSQL
+- Add structured logging + tracing (OpenTelemetry)
+- Add API and E2E tests
+- Add secrets manager integration
+- Add domain + HTTPS + reverse proxy with single-origin routing
+- Add webhook handler for Plaid updates
+

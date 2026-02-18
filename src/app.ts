@@ -9,6 +9,7 @@ import { errorHandler, notFoundHandler } from "./middleware/error";
 import { apiRoutes } from "./routes";
 
 const app = express();
+app.set("trust proxy", 1);
 
 app.use(helmet());
 app.use(
@@ -17,7 +18,7 @@ app.use(
       env.corsOrigins.length === 1 && env.corsOrigins[0] === "*"
         ? true
         : env.corsOrigins,
-    credentials: true,
+    credentials: false,
   }),
 );
 app.use(
