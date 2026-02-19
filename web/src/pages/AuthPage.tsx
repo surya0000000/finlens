@@ -49,8 +49,8 @@ export const AuthPage = () => {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>FinLens X</h1>
-        <p>Unified, read-only financial intelligence for modern users.</p>
+        <h1>FinLens</h1>
+        <p>Calm, high-clarity financial intelligence with read-only control.</p>
 
         <div className="auth-toggle">
           <button
