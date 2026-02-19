@@ -87,28 +87,28 @@ export const PlaidConnectCard = ({ onLinked }: PlaidConnectCardProps) => {
     createLinkTokenMutation.isPending || sandboxConnectMutation.isPending || exchangeMutation.isPending;
 
   return (
-    <section className="card plaid-card">
-      <header className="section-header">
+    <section className="plaid-card">
+      <header className="plaid-header">
         <div>
-          <h3>Connect your accounts</h3>
-          <p>Use Plaid Link for secure read-only bank and card sync.</p>
+          <h4>Add account connection</h4>
+          <p>Secure read-only sync via Plaid.</p>
         </div>
       </header>
 
-      <div className="button-row">
+      <div className="plaid-actions">
         <button
           type="button"
-          className="primary-button"
+          className="action-button"
           disabled={isLoading}
           onClick={() => createLinkTokenMutation.mutate()}
         >
-          <Link2 size={16} />
+          <Link2 size={14} />
           Connect with Plaid
         </button>
 
         <button
           type="button"
-          className="secondary-button"
+          className="action-button subtle"
           disabled={isLoading}
           onClick={() => sandboxConnectMutation.mutate()}
         >

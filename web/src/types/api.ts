@@ -68,6 +68,16 @@ export type Account = {
   unofficialCurrencyCode: string | null;
 };
 
+export type PlaidItem = {
+  id: string;
+  plaidItemId: string;
+  institutionId: string | null;
+  institutionName: string | null;
+  createdAt: string;
+  updatedAt: string;
+  lastSyncedAt: string | null;
+};
+
 export type Transaction = {
   id: string;
   plaidTransactionId: string;

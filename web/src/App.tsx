@@ -9,11 +9,9 @@ const DashboardPage = lazy(() =>
   import("./pages/DashboardPage").then((module) => ({ default: module.DashboardPage })),
 );
 const AccountsPage = lazy(() => import("./pages/AccountsPage").then((module) => ({ default: module.AccountsPage })));
-const SubscriptionsPage = lazy(() =>
-  import("./pages/SubscriptionsPage").then((module) => ({ default: module.SubscriptionsPage })),
+const DeepAnalyticsPage = lazy(() =>
+  import("./pages/InsightsPage").then((module) => ({ default: module.InsightsPage })),
 );
-const InsightsPage = lazy(() => import("./pages/InsightsPage").then((module) => ({ default: module.InsightsPage })));
-const AdvisorPage = lazy(() => import("./pages/AdvisorPage").then((module) => ({ default: module.AdvisorPage })));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage").then((module) => ({ default: module.NotFoundPage })));
 
 const ProtectedLayout = () => (
@@ -23,10 +21,11 @@ const ProtectedLayout = () => (
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/analytics" element={<DeepAnalyticsPage />} />
           <Route path="/accounts" element={<AccountsPage />} />
-          <Route path="/subscriptions" element={<SubscriptionsPage />} />
-          <Route path="/insights" element={<InsightsPage />} />
-          <Route path="/advisor" element={<AdvisorPage />} />
+          <Route path="/insights" element={<Navigate to="/analytics" replace />} />
+          <Route path="/subscriptions" element={<Navigate to="/analytics" replace />} />
+          <Route path="/advisor" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
