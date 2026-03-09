@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: finlens-backend
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run prisma:generate && npm run build
+    startCommand: npx prisma db push && node dist/index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: PLAID_ENV
+        value: sandbox
+      - key: PLAID_PRODUCTS
+        value: transactions
+      - key: PLAID_COUNTRY_CODES
+        value: US
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      # Set these in Render dashboard (sensitive):
+      # DATABASE_URL, JWT_SECRET, TOKEN_ENCRYPTION_KEY,
+      # PLAID_CLIENT_ID, PLAID_SECRET, OPENAI_API_KEY, CORS_ORIGIN
