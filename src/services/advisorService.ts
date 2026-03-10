@@ -19,6 +19,8 @@ const openaiClient = env.OPENAI_API_KEY
     })
   : null;
 
+console.log(`[advisorService] OpenAI client: ${openaiClient ? "ENABLED" : "DISABLED (OPENAI_API_KEY not set)"}`);
+
 const buildRuleBasedAnswer = (
   question: string,
   context: {
